@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ofMain.h"
+#include "ofMain#include "ofxJSON.h"
 
 #define NBIMAGES 30
 
@@ -21,9 +21,10 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-	long frameCount;
-	int choice;
-	bool change;
+
+
+    int choice;
+    bool change;
 	void changeHeightmap();
 	ofImage img;
 

@@ -2,20 +2,14 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-
 	ofSetVerticalSync(true);
-	ofSetFrameRate(60);
+	ofSetFrameRate(1);
 	ofBackground(0,0,0);
+	ofHideCursor();
 
-    //init Serial communication
-    serial.listDevices();
-    vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
-    int baud = 9600;
-    serial.setup("/dev/ttyACM0", baud);
-    json = "";
-
-    change = false;
-	img.loadImage("2.png");
+	frameCount = 0;
+	choice = 0;
+	img.loadImage("10.png");
 
 	//store the width and height for convenience
 	int width = img.getWidth();
@@ -25,7 +19,7 @@ void ofApp::setup(){
 	for (int y = 0; y < height; y++){
 		for (int x = 0; x<width; x++){
 			mainMesh.addVertex(ofPoint(x,y,0));	// mesh index = x + y*width
-												// this replicates the pixel array within the camera bitmap...
+								// this replicates the pixel array within the camera bitmap...
 			mainMesh.addColor(ofFloatColor(0,0,0));  // placeholder for colour data, we'll get this from the camera
 		}
 	}
@@ -50,42 +44,25 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    if( serial.available() ){
-        //cout << "\tavailable: " << ofToString( serial.available() ) << endl;
-        while( serial.available() ){
-            lastChar = char( serial.readByte() );
-            json += ofToString( lastChar );
-        }
-
-        if(lastChar == '\n'){
-            bool parsingSuccessful = jsonEl.parse( json );
-
-            if( parsingSuccessful ){
-                if( jsonEl[ "btn" ] == 1 && change == false){
-                    changeHeightmap();
-                    change = true;
-                }
-                else{
-                    change = false;
-                }
-            }
-            json = "";
-        }
-    }
+	frameCount++;
+	if(frameCount%5 == 0){
+		changeHeightmap();
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	img.draw(0,0);
+
 	ofPushMatrix();
 	ofTranslate(-img.getWidth()/2, -img.getHeight()/2, 0);
 	ofTranslate(ofGetWidth()/2, 7 * ofGetHeight() / 10., 0);
-	ofRotateX(70);
+	//ofRotateX(50);
 	mainMesh.drawFaces();
 	ofPopMatrix();
 }
 
 void ofApp::changeHeightmap(){
-    //random texture
     choice = (choice + 1) % NBIMAGES;
 
     string result;          // string which will contain the result
@@ -109,12 +86,6 @@ void ofApp::changeHeightmap(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     changeHeightmap();
-	switch(key) {
-		case 'f':
-			ofToggleFullscreen();
-			break;
-	}
-
 }
 
 //--------------------------------------------------------------
